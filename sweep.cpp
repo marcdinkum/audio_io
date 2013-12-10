@@ -48,14 +48,23 @@ unsigned long x=0;		// sample index
 unsigned long bufptr=0;		// pointer into sample buffer
 double l_freq=300.0;		// base frequency of left channel
 double r_freq=850.0;		// base frequency of right channel
-double l_amp=0.4;		// base amplitude of left channel
-double r_amp=0.4;		// base amplitude of right channel
+double l_amp=0.3;		// base amplitude of left channel
+double r_amp=0.3;		// base amplitude of right channel
+int output_device=0;
 
   audiostream.set_samplerate(SAMPLERATE);
   audiostream.set_nrofchannels(NROFCHANNELS);
   audiostream.set_framesperbuffer(FRAMESPERBUFFER);
 
   audiostream.initialise();
+  audiostream.list_devices();
+  cout << "Give output device number: ";
+  cin >> output_device;
+  if(audiostream.set_output_device(output_device) == -1){
+    cout << "Device does not exist" << endl;
+    return -1;
+  }
+  audiostream.start_server();
 
   do{
     for(bufptr=0; bufptr < FRAMESPERBUFFER*NROFCHANNELS; bufptr+=2)

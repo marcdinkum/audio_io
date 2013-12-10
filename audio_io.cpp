@@ -48,6 +48,9 @@ Audio_IO::Audio_IO()
   samplerate=DEFAULT_SAMPLERATE;
   nrofchannels=DEFAULT_NROFCHANNELS;
   mode=AUDIO_IO_WRITEONLY;
+  input_device=-1;
+  output_device=-1;
+  nrofdevices=0;
 }
 
 Audio_IO::Audio_IO(int samplerate,int nrofchannels)
@@ -99,24 +102,75 @@ int Audio_IO::get_framesperbuffer()
 }
 
 
+/* Querying devices:
+  http://portaudio.com/docs/v19-doxydocs/querying_devices.html
+ */
+int Audio_IO::list_devices()
+{
+const PaDeviceInfo *info;
+nrofdevices=Pa_GetDeviceCount();
+
+  if(nrofdevices <= 0){
+    cout << "No devices found" << endl;
+    return 0;
+  } // if
+
+  for(int d=0;d<nrofdevices;d++)
+  {
+    info = Pa_GetDeviceInfo(d);
+    cout << "Device " << d << "\t" << info->name;
+    if(info->maxInputChannels > 0) cout << " (IN)";
+    if(info->maxOutputChannels > 0) cout << " (OUT)";
+    cout << endl;
+  } // for
+
+  return nrofdevices;
+} // list_devices()
+
+
+int Audio_IO::set_input_device(int device)
+{
+  if(device >= nrofdevices) return -1;
+  input_device=device;
+  return 0;
+}
+
+int Audio_IO::set_output_device(int device)
+{
+  if(device >= nrofdevices) return -1;
+  output_device=device;
+  return 0;
+}
+
+
 void Audio_IO::initialise()
 {
   err = Pa_Initialize();
   if(err != paNoError) leave();
+} // initialise()
 
-  outputParameters.device = Pa_GetDefaultOutputDevice();
-  outputParameters.channelCount = nrofchannels;
-  outputParameters.sampleFormat = paFloat32;
-  outputParameters.suggestedLatency =
-    Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency;
-  outputParameters.hostApiSpecificStreamInfo = NULL;
 
-  inputParameters.device = Pa_GetDefaultInputDevice();
-  inputParameters.channelCount = nrofchannels;
-  inputParameters.sampleFormat = paFloat32;
-  inputParameters.suggestedLatency =
-    Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency;
-  inputParameters.hostApiSpecificStreamInfo = NULL;
+void Audio_IO::start_server()
+{
+  //outputParameters.device = Pa_GetDefaultOutputDevice();
+  if(mode==AUDIO_IO_WRITEONLY || mode==AUDIO_IO_READWRITE){
+    outputParameters.device = output_device;
+    outputParameters.channelCount = nrofchannels;
+    outputParameters.sampleFormat = paFloat32;
+    outputParameters.suggestedLatency =
+      Pa_GetDeviceInfo(output_device)->defaultLowOutputLatency;
+    outputParameters.hostApiSpecificStreamInfo = NULL;
+  }
+
+  if(mode==AUDIO_IO_READONLY || mode==AUDIO_IO_READWRITE){
+    //inputParameters.device = Pa_GetDefaultInputDevice();
+    inputParameters.device = input_device;
+    inputParameters.channelCount = nrofchannels;
+    inputParameters.sampleFormat = paFloat32;
+    inputParameters.suggestedLatency =
+      Pa_GetDeviceInfo(input_device)->defaultLowInputLatency;
+    inputParameters.hostApiSpecificStreamInfo = NULL;
+  }
 
   switch(mode)
   {
@@ -160,7 +214,7 @@ void Audio_IO::initialise()
 
   err = Pa_StartStream(stream);
   if(err != paNoError) leave();
-} // initialise()
+} // start_server()
 
 
 void Audio_IO::write(float *buf)

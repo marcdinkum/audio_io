@@ -35,7 +35,7 @@ using namespace std;
 
 #define SAMPLERATE		44100
 #define NROFCHANNELS		2
-#define NUM_SECONDS		3
+#define NUM_SECONDS		15
 
 #define FRAMESPERBUFFER		1024
 
@@ -46,6 +46,7 @@ Audio_IO audiostream;
 float samplebuffer[SAMPLERATE * NROFCHANNELS * NUM_SECONDS];
 long buffersize=SAMPLERATE * NROFCHANNELS * NUM_SECONDS;
 long bufptr;
+int input_device=0,output_device=0;
 
   audiostream.set_mode(AUDIO_IO_READWRITE);
   audiostream.set_samplerate(SAMPLERATE);
@@ -53,6 +54,15 @@ long bufptr;
   audiostream.set_framesperbuffer(FRAMESPERBUFFER);
 
   audiostream.initialise();
+  audiostream.list_devices();
+  cout << "\nGive input device number: ";
+  cin >> input_device;
+  audiostream.set_input_device(input_device);
+  cout << "Give output device number: ";
+  cin >> output_device;
+  audiostream.set_output_device(output_device);
+  audiostream.start_server();
+
 
   for(bufptr=0; bufptr < buffersize-FRAMESPERBUFFER*NROFCHANNELS;
       bufptr+=FRAMESPERBUFFER*NROFCHANNELS)

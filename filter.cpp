@@ -36,7 +36,8 @@ using namespace std;
 #define SAMPLERATE		44100
 #define NROFCHANNELS		1
 
-#define FRAMESPERBUFFER		1024
+#define FRAMESPERBUFFER		2048
+#define HALFBUFFER		1024
 
 
 /*
@@ -46,10 +47,9 @@ using namespace std;
 */
 void filterfunction(float * buf)
 {
-  for(int c=0; c<FRAMESPERBUFFER*NROFCHANNELS; c++)
-  {
-    buf[c] *= 0.5;
-  } // for
+  // Quick and dirty Smurf
+  for(int c=0; c<HALFBUFFER; c++) buf[c] = buf[2*c];
+  for(int c=0; c<HALFBUFFER; c++) buf[HALFBUFFER + c] = buf[c];
 }
 
 
@@ -57,6 +57,7 @@ int main(int argc,char** argv)
 {
 Audio_IO audiostream;
 float samplebuffer[FRAMESPERBUFFER * NROFCHANNELS];
+int input_device=0,output_device=0;
 
   audiostream.set_mode(AUDIO_IO_READWRITE);
   audiostream.set_samplerate(SAMPLERATE);
@@ -64,6 +65,14 @@ float samplebuffer[FRAMESPERBUFFER * NROFCHANNELS];
   audiostream.set_framesperbuffer(FRAMESPERBUFFER);
 
   audiostream.initialise();
+  audiostream.list_devices();
+  cout << "\nGive input device number: ";
+  cin >> input_device;
+  audiostream.set_input_device(input_device);
+  cout << "Give output device number: ";
+  cin >> output_device;
+  audiostream.set_output_device(output_device);
+  audiostream.start_server();
 
   while(true)
   {

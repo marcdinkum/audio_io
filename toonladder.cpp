@@ -50,12 +50,19 @@ double l_freq=440.0;		// base frequency of left channel
 double r_freq=440.0;		// base frequency of right channel
 double l_amp=0.4;		// base amplitude of left channel
 double r_amp=0.4;		// base amplitude of right channel
+int output_device=0;
 
   audiostream.set_samplerate(SAMPLERATE);
   audiostream.set_nrofchannels(NROFCHANNELS);
   audiostream.set_framesperbuffer(FRAMESPERBUFFER);
 
   audiostream.initialise();
+  audiostream.list_devices();
+  cout << "Give output device number: ";
+  cin >> output_device;
+  audiostream.set_output_device(output_device);
+  audiostream.start_server();
+
   for(int note=0;note<=12;note++)
   {
     cout << "note: " << note << " l freq: " << l_freq << endl;

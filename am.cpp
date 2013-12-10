@@ -55,12 +55,18 @@ double l_mod_freq=25;		// modulation freq of left channel
 double l_mod_depth=1.0;
 double r_mod_freq=30;
 double r_mod_depth=0.6;
+int output_device=0;
 
   audiostream.set_samplerate(SAMPLERATE);
   audiostream.set_nrofchannels(NROFCHANNELS);
   audiostream.set_framesperbuffer(FRAMESPERBUFFER);
 
   audiostream.initialise();
+  audiostream.list_devices();
+  cout << "Give output device number: ";
+  cin >> output_device;
+  audiostream.set_output_device(output_device);
+  audiostream.start_server();
 
   do{
     for(bufptr=0; bufptr < FRAMESPERBUFFER*NROFCHANNELS; bufptr+=2)

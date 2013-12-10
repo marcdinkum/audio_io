@@ -42,27 +42,33 @@ using namespace std;
 
 int main(int argc,char** argv)
 {
-  Audio_IO audiostream;
-  float samplebuffer[FRAMESPERBUFFER * NROFCHANNELS];
-  unsigned long bufptr=0;		// pointer into sample buffer
-  unsigned long x=0;		// sample index
-  double xx;			// 2 PI / Fs version of x
+Audio_IO audiostream;
+float samplebuffer[FRAMESPERBUFFER * NROFCHANNELS];
+unsigned long bufptr=0;		// pointer into sample buffer
+unsigned long x=0;		// sample index
+double xx;			// 2 PI / Fs version of x
 
-  double l_freq=1500.0;		// base frequency of left channel
-  double l_amp=0.4;		// base amplitude [0:1] of left channel
-  double l_mod_freq=20;		// modulation freq for left channel
-  double l_mod_depth=20*M_PI;
+double l_freq=1500.0;		// base frequency of left channel
+double l_amp=0.4;		// base amplitude [0:1] of left channel
+double l_mod_freq=20;		// modulation freq for left channel
+double l_mod_depth=20*M_PI;
 
-  double r_freq=850.0;		// base frequency of right channel
-  double r_amp=0.4;		// base amplitude [0:1] of right channel
-  double r_mod_freq=5;
-  double r_mod_depth=10*M_PI;
+double r_freq=850.0;		// base frequency of right channel
+double r_amp=0.4;		// base amplitude [0:1] of right channel
+double r_mod_freq=5;
+double r_mod_depth=10*M_PI;
+int output_device=0;
 
   audiostream.set_samplerate(SAMPLERATE);
   audiostream.set_nrofchannels(NROFCHANNELS);
   audiostream.set_framesperbuffer(FRAMESPERBUFFER);
 
   audiostream.initialise();
+  audiostream.list_devices();
+  cout << "Give output device number: ";
+  cin >> output_device;
+  audiostream.set_output_device(output_device);
+  audiostream.start_server();
 
   do{
     for(bufptr=0; bufptr < FRAMESPERBUFFER*NROFCHANNELS; bufptr+=2)
