@@ -57,7 +57,7 @@ int main(int argc,char** argv)
 {
 Audio_IO audiostream;
 float samplebuffer[FRAMESPERBUFFER * NROFCHANNELS];
-int input_device=0,output_device=0;
+int input_device=-1,output_device=-1;
 
   audiostream.set_mode(AUDIO_IO_READWRITE);
   audiostream.set_samplerate(SAMPLERATE);
