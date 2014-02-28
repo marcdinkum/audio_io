@@ -1,7 +1,7 @@
 audio_io
 ========
 
-Simple C++ wrapper for Portaudio, using direct I/O instead of callbacks
+Simple C++ wrapper for Portaudio, using blocking I/O instead of callbacks
 
 
 USAGE
