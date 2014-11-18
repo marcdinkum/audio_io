@@ -152,23 +152,27 @@ void Audio_IO::initialise()
 
 void Audio_IO::start_server()
 {
-  //outputParameters.device = Pa_GetDefaultOutputDevice();
   if(mode==AUDIO_IO_WRITEONLY || mode==AUDIO_IO_READWRITE){
-    outputParameters.device = output_device;
+    if(output_device > 0)
+      outputParameters.device = output_device;
+    else
+      outputParameters.device = Pa_GetDefaultOutputDevice();
     outputParameters.channelCount = nrofchannels;
     outputParameters.sampleFormat = paFloat32;
     outputParameters.suggestedLatency =
-      Pa_GetDeviceInfo(output_device)->defaultLowOutputLatency;
+      Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
   }
 
   if(mode==AUDIO_IO_READONLY || mode==AUDIO_IO_READWRITE){
-    //inputParameters.device = Pa_GetDefaultInputDevice();
-    inputParameters.device = input_device;
+    if(input_device > 0)
+      inputParameters.device = input_device;
+    else
+      inputParameters.device = Pa_GetDefaultInputDevice();
     inputParameters.channelCount = nrofchannels;
     inputParameters.sampleFormat = paFloat32;
     inputParameters.suggestedLatency =
-      Pa_GetDeviceInfo(input_device)->defaultLowInputLatency;
+      Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency;
     inputParameters.hostApiSpecificStreamInfo = NULL;
   }
 
