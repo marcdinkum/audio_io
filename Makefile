@@ -1,7 +1,7 @@
 CPP = g++
 CC = gcc
-CFLAGS = -Wall -I../include
-LDFLAGS= -lportaudio
+CFLAGS = -I/usr/local/include -Wall -I../include
+LDFLAGS= -L/usr/local/lib -lportaudio
 
 
 all: sinewave sinephase sweep am fm delay filter toonladder
