@@ -1,5 +1,5 @@
 /**********************************************************************
-*          Copyright (c) 2013, Hogeschool voor de Kunsten Utrecht
+*          Copyright (c) 2014, Hogeschool voor de Kunsten Utrecht
 *                      Hilversum, the Netherlands
 *                          All rights reserved
 ***********************************************************************
@@ -37,26 +37,20 @@ using namespace std;
 #define NROFCHANNELS		2
 #define NUM_SECONDS		3
 
-#define FRAMESPERBUFFER		1024
+#define FRAMESPERBUFFER		64
 
 
 int main(int argc,char** argv)
 {
 Audio_IO audiostream;
 float samplebuffer[FRAMESPERBUFFER * NROFCHANNELS];
-unsigned long bufptr=0;		// pointer into sample buffer
 unsigned long x=0;		// sample index
-double xx;			// 2 PI / Fs version of x
-
-double l_freq=1500.0;		// base frequency of left channel
-double l_amp=0.4;		// base amplitude [0:1] of left channel
-double l_mod_freq=20;		// modulation freq for left channel
-double l_mod_depth=20*M_PI;
-
-double r_freq=850.0;		// base frequency of right channel
-double r_amp=0.4;		// base amplitude [0:1] of right channel
-double r_mod_freq=5;
-double r_mod_depth=10*M_PI;
+unsigned long bufptr=0;		// pointer into sample buffer
+double freq[]={1500.0,850};	// base frequency of each channel
+double amp[]={0.4,0.4};		// base amplitude of each channel
+double mod_freq[]={20,5};	// modulation freq for each channel
+double mod_depth[]={20*M_PI,10*M_PI}; // modulation depth for each channel
+double xx;			// 2 PI/fs version of x
 int output_device=0;
 
   audiostream.set_samplerate(SAMPLERATE);
@@ -71,23 +65,22 @@ int output_device=0;
   audiostream.start_server();
 
   do{
-    for(bufptr=0; bufptr < FRAMESPERBUFFER*NROFCHANNELS; bufptr+=2)
+    // Fill a new buffer with samples
+    for(bufptr=0; bufptr < FRAMESPERBUFFER*NROFCHANNELS; bufptr+=NROFCHANNELS)
     {
 
       /*
        * sine shaped frequency (phase) modulation
        */
       xx = x * 2.0*M_PI / SAMPLERATE;
-
-      // Fill a new buffer with samples
-      samplebuffer[bufptr] =
-        (float)(l_amp * sin(xx*l_freq + l_mod_depth*sin(xx * l_mod_freq)));
-      samplebuffer[bufptr + 1]  =
-        (float)(r_amp * sin(xx*r_freq + r_mod_depth*sin(xx * r_mod_freq)));
-
-      x++;
-      l_mod_freq *= 0.99999; // just for fun
-    } // for
+      // loop over the channels in one frame
+      for(int channel=0;channel<NROFCHANNELS;channel++){
+        samplebuffer[bufptr+channel] =
+          (float)(amp[channel] * sin(xx*freq[channel] + mod_depth[channel]*sin(xx * mod_freq[channel])));
+      } // for channel
+      x++; // advance to next (global) time index
+      mod_freq[0] *= 0.99999; // just for fun
+    } // for buffer index
 
     // send buffer to Portaudio
     audiostream.write(samplebuffer);

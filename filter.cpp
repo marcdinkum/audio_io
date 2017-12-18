@@ -34,10 +34,10 @@
 using namespace std;
 
 #define SAMPLERATE		44100
-#define NROFCHANNELS		1
+#define NROFCHANNELS		2
 
-#define FRAMESPERBUFFER		2048
-#define HALFBUFFER		1024
+#define FRAMESPERBUFFER		256
+#define HALFBUFFER		128
 
 
 /*
@@ -48,9 +48,9 @@ using namespace std;
 void filterfunction(float * buf)
 {
   // Quick and dirty Smurf
-  for(int c=0; c<HALFBUFFER; c++) buf[c] = buf[2*c];
+  //for(int c=0; c<HALFBUFFER; c++) buf[c] = buf[2*c];
   for(int c=0; c<HALFBUFFER; c++) buf[HALFBUFFER + c] = buf[c];
-}
+} // filterfunction()
 
 
 int main(int argc,char** argv)

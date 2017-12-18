@@ -1,5 +1,5 @@
 /**********************************************************************
-*          Copyright (c) 2013, Hogeschool voor de Kunsten Utrecht
+*          Copyright (c) 2014, Hogeschool voor de Kunsten Utrecht
 *                      Hilversum, the Netherlands
 *                          All rights reserved
 ***********************************************************************
@@ -46,10 +46,8 @@ Audio_IO audiostream;
 float samplebuffer[FRAMESPERBUFFER * NROFCHANNELS];
 unsigned long x=0;		// sample index
 unsigned long bufptr=0;		// pointer into sample buffer
-double l_freq=300.0;		// base frequency of left channel
-double r_freq=850.0;		// base frequency of right channel
-double l_amp=0.4;		// base amplitude of left channel
-double r_amp=0.4;		// base amplitude of right channel
+double freq[]={1600.0,1600.0};	// base frequency of each channel
+double amp[]={0.4,0.4};		// base amplitude of each channel
 int output_device=0;
 
   audiostream.set_samplerate(SAMPLERATE);
@@ -64,15 +62,16 @@ int output_device=0;
   audiostream.start_server();
 
   do{
+    // Fill a new buffer with samples
     for(bufptr=0; bufptr < FRAMESPERBUFFER*NROFCHANNELS; bufptr+=NROFCHANNELS)
     {
-      // Fill a new buffer with samples
-      samplebuffer[bufptr] =
-        (float)(l_amp * sin( (double)x * l_freq/SAMPLERATE * M_PI * 2.));
-      samplebuffer[bufptr + 1] =
-        (float)(r_amp * sin( (double)x * r_freq/SAMPLERATE * M_PI * 2.));
-      x++;
-    } // for
+      // loop over the channels in one frame
+      for(int channel=0;channel<NROFCHANNELS;channel++){
+	samplebuffer[bufptr+channel] =
+	  (float)(amp[channel] * sin( (double)x * freq[channel]/SAMPLERATE * M_PI * 2.));
+      } // for channel
+      x++; // advance to next (global) time index
+    } // for buffer index
 
     // send buffer to Portaudio
     audiostream.write(samplebuffer);

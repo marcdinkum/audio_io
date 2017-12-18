@@ -37,7 +37,7 @@ using namespace std;
 #define NROFCHANNELS		2
 #define NUM_SECONDS		3
 
-#define FRAMESPERBUFFER		1024
+#define FRAMESPERBUFFER		64
 
 
 int main(int argc,char** argv)

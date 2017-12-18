@@ -62,10 +62,12 @@ int output_device=0;
   audiostream.set_framesperbuffer(FRAMESPERBUFFER);
 
   audiostream.initialise();
+  /*
   audiostream.list_devices();
   cout << "Give output device number: ";
   cin >> output_device;
   audiostream.set_output_device(output_device);
+  */
   audiostream.start_server();
 
   do{
